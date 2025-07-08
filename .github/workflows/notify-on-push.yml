@@ -12,11 +12,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2   # 👈 fetch 2 commits so HEAD~1 works
 
       - name: Get changed files
         id: diff
         run: |
-          echo "changed=$(git diff --name-only HEAD~1 | sed ':a;N;$!ba;s/\n/\\n/g')" >> $GITHUB_OUTPUT
+          CHANGED=$(git diff --name-only HEAD~1)
+          echo "changed=${CHANGED//$'\n'/\\n}" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Issue
         env:
@@ -24,7 +27,7 @@ jobs:
           REPO: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
         run: |
-          CHANGED_FILES=$(echo "${{ steps.diff.outputs.changed }}" | sed ':a;N;$!ba;s/\n/\\n/g')
+          CHANGED_FILES="${{ steps.diff.outputs.changed }}"
           ISSUE_TITLE="Code pushed by $ACTOR on branch main"
           ISSUE_BODY="New code was pushed by @$ACTOR\n\nChanged files:\n\`\`\`\n$CHANGED_FILES\n\`\`\`"
 
