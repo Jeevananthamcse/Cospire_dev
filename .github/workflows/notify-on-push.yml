@@ -8,24 +8,26 @@ on:
 jobs:
   create-issue:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Get list of changed files
-        id: changes
+        id: files
         run: |
-          echo "files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | xargs)" >> $GITHUB_OUTPUT
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
+          git diff --name-only HEAD~1 >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Create GitHub Issue
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
           REPO: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
+          CHANGED_FILES: ${{ env.CHANGED_FILES }}
         run: |
-          ISSUE_TITLE=" Code pushed by $ACTOR on branch main"
-          ISSUE_BODY="### New code was pushed by @$ACTOR\n\n**Changed files:**\n${{ steps.changes.outputs.files }}"
+          ISSUE_TITLE="Code pushed by $ACTOR on branch main"
+          ISSUE_BODY="New code was pushed by @$ACTOR\n\nChanged files:\n\`\`\`\n$CHANGED_FILES\n\`\`\`"
 
           curl -X POST \
             -H "Authorization: token $GH_TOKEN" \
