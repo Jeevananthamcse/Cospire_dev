@@ -9,14 +9,25 @@ jobs:
   create-issue:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout the latest code
+        uses: actions/checkout@v4
+
+      - name: Get list of changed files
+        id: changes
+        run: |
+          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
       - name: Create GitHub Issue
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
           REPO: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
+          CHANGED_FILES: ${{ env.CHANGED_FILES }}
         run: |
-          ISSUE_TITLE="Code pushed by $ACTOR on branch main"
-          ISSUE_BODY="New code was pushed to main branch by @$ACTOR"
+          ISSUE_TITLE=" Code pushed by $ACTOR on branch main"
+          ISSUE_BODY="### New code was pushed to **main** by @$ACTOR\n\n**Files changed:**\n\`\`\`\n$CHANGED_FILES\n\`\`\`"
 
           curl -X POST \
             -H "Authorization: token $GH_TOKEN" \
