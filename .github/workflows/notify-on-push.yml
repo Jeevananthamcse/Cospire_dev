@@ -8,25 +8,24 @@ on:
 jobs:
   create-issue:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Get changed files
-        id: changes
+        id: diff
         run: |
-          echo "CHANGED_FILES<<EOF" >> $GITHUB_ENV
-          git diff --name-only HEAD~1 >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "changed=$(git diff --name-only HEAD~1 | sed ':a;N;$!ba;s/\n/\\n/g')" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Issue
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
           REPO: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
-          CHANGED_FILES: ${{ env.CHANGED_FILES }}
         run: |
-          ISSUE_TITLE="Code pushed by $ACTOR on branch main"
+          CHANGED_FILES="${{ steps.diff.outputs.changed }}"
+          ISSUE_TITLE=" Code pushed by $ACTOR on branch main"
           ISSUE_BODY="New code was pushed by @$ACTOR\n\nChanged files:\n\`\`\`\n$CHANGED_FILES\n\`\`\`"
 
           curl -X POST \
