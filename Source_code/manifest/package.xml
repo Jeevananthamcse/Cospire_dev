@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Deployment__c</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>DeploymentTrigger</members>
+        <name>ApexTrigger</name>
+    </types>
+    <types>
+        <members>DeploymentValidator</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>Set_Deployment_Status_On_Create</members>
+        <name>Flow</name>
+    </types>
+    <version>58.0</version>
+</Package>
