@@ -15,7 +15,7 @@ jobs:
           REPO: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
         run: |
-          ISSUE_TITLE="🚀 Code pushed by $ACTOR on branch main"
+          ISSUE_TITLE="Code pushed by $ACTOR on branch main"
           ISSUE_BODY="New code was pushed to main branch by @$ACTOR"
 
           curl -X POST \
