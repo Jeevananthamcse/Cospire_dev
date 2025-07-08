@@ -1,4 +1,4 @@
-name: Notify Admin on Push
+name: Create Issue on Push
 
 on:
   push:
@@ -6,17 +6,20 @@ on:
       - main
 
 jobs:
-  notify:
+  create-issue:
     runs-on: ubuntu-latest
     steps:
-      - name: Call API to notify admin
+      - name: Create GitHub Issue
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
         run: |
-          curl -X POST https://your-api-or-email-service.com/notify \
-          -H "Authorization: token ${{ secrets.GH_PAT }}" \
-          -H "Content-Type: application/json" \
-          -d '{
-                "message": "Code was pushed to the repository.",
-                "by": "${{ github.actor }}",
-                "repo": "${{ github.repository }}",
-                "commit": "${{ github.sha }}"
-              }'
+          ISSUE_TITLE="🚀 Code pushed by $ACTOR on branch main"
+          ISSUE_BODY="New code was pushed to main branch by @$ACTOR"
+
+          curl -X POST \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/$REPO/issues \
+            -d "{\"title\":\"$ISSUE_TITLE\",\"body\":\"$ISSUE_BODY\"}"
