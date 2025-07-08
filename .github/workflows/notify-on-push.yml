@@ -24,8 +24,8 @@ jobs:
           REPO: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
         run: |
-          CHANGED_FILES="${{ steps.diff.outputs.changed }}"
-          ISSUE_TITLE=" Code pushed by $ACTOR on branch main"
+          CHANGED_FILES=$(echo "${{ steps.diff.outputs.changed }}" | sed ':a;N;$!ba;s/\n/\\n/g')
+          ISSUE_TITLE="Code pushed by $ACTOR on branch main"
           ISSUE_BODY="New code was pushed by @$ACTOR\n\nChanged files:\n\`\`\`\n$CHANGED_FILES\n\`\`\`"
 
           curl -X POST \
