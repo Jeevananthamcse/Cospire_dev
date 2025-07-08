@@ -1,0 +1,22 @@
+name: Notify Admin on Push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call API to notify admin
+        run: |
+          curl -X POST https://your-api-or-email-service.com/notify \
+          -H "Authorization: token ${{ secrets.GH_PAT }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+                "message": "Code was pushed to the repository.",
+                "by": "${{ github.actor }}",
+                "repo": "${{ github.repository }}",
+                "commit": "${{ github.sha }}"
+              }'
